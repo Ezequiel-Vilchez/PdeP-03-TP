@@ -13,15 +13,27 @@ export class Tarea {
 
     // ----------------------------------------- Constructor -----------------------------------------
 
-    constructor(_titulo: string, _descripcion: string, _prioridad: typeof PRIORIDAD[number], _estado: typeof ESTADO[number], _fechaVencimiento: Date) {
+    constructor(_titulo: string, _descripcion: string, _prioridad: typeof PRIORIDAD[number], _estado: typeof ESTADO[number], _fechaCreacion: Date | null, _fechaVencimiento: Date, _fechaUltimaEdicion: Date | null) {
         let day: Date = new Date();
         this._titulo = _titulo;
         this._descripcion = _descripcion;
         this._prioridad = _prioridad;
         this._estado = _estado;
-        this._fechaCreacion = new Date(fechaToString(day.getFullYear().toString(), (day.getMonth() + 1).toString(), day.getDate().toString()) + "T03:00:00Z");
+
+        if (_fechaCreacion === null) {
+            this._fechaCreacion = new Date(fechaToString(day.getFullYear().toString(), (day.getMonth() + 1).toString(), day.getDate().toString()) + "T03:00:00Z");
+        } else {
+            this._fechaCreacion = new Date(_fechaCreacion);
+        }
+        
         this._fechaVencimiento = _fechaVencimiento;
-        this._fechaUltimaEdicion = new Date(fechaToString(day.getFullYear().toString(), (day.getMonth() + 1).toString(), day.getDate().toString()) + "T03:00:00Z");
+
+        if (_fechaUltimaEdicion === null) {
+            this._fechaUltimaEdicion = new Date(fechaToString(day.getFullYear().toString(), (day.getMonth() + 1).toString(), day.getDate().toString()) + "T03:00:00Z");
+        } else {
+            this._fechaUltimaEdicion = new Date(_fechaUltimaEdicion);
+        }
+        
     }
 
 

@@ -3,6 +3,7 @@ import { Tarea } from "./class/Tarea";
 import { ToDoList } from "./class/ToDoList";
 import { esFechaValida, comprobarFormatoAnio, comprobarFormatoMes, comprobarFormatoDia, fechaToString } from "./lib/funciones";
 import { input, close } from "./lib/input";
+import tareas from './tasks.json';
 
 
 // Menús de opciones
@@ -36,7 +37,9 @@ async function main(): Promise<void> {
         "Comprar frutas y verduras para la semana",
         PRIORIDAD[1],
         ESTADO[0],
-        new Date(fechaToString("2025", "11", "15") + "T03:00:00Z") // UTC-3
+        null,
+        new Date(fechaToString("2025", "11", "15") + "T03:00:00Z"), // UTC-3
+        null
     );
 
     let tarea2 = new Tarea(
@@ -44,7 +47,9 @@ async function main(): Promise<void> {
         "Crear diapositivas para la reunión del lunes",
         PRIORIDAD[0],
         ESTADO[1],
-        new Date(fechaToString("2024", "10", "30") + "T03:00:00Z") // UTC-3
+        null,
+        new Date(fechaToString("2024", "10", "30") + "T03:00:00Z"), // UTC-3
+        null
     );
 
     let tarea3 = new Tarea(
@@ -52,7 +57,9 @@ async function main(): Promise<void> {
         "Ir al gimnasio por la tarde",
         PRIORIDAD[2],
         ESTADO[2],
-        new Date(fechaToString("2024", "06", "20") + "T03:00:00Z") // UTC-3
+        null,
+        new Date(fechaToString("2024", "06", "20") + "T03:00:00Z"), // UTC-3
+        null
     );
 
     let tarea4 = new Tarea(
@@ -60,13 +67,30 @@ async function main(): Promise<void> {
         "Terminar de leer 'El Principito'",
         PRIORIDAD[2],
         ESTADO[3],
-        new Date(fechaToString("2026", "01", "05") + "T03:00:00Z") // UTC-3
+        null,
+        new Date(fechaToString("2026", "01", "05") + "T03:00:00Z"), // UTC-3
+        null
     );
 
 
 
     let miToDoList = new ToDoList();
     let salirDelMenu: boolean = false;
+
+    // Leemos el archivo json.
+
+
+    console.log(new Date(tareas[0]["fechaCreacion"]));
+
+    await input('Presione "Enter" para continuar...');
+
+    // Agregar tareas a MiToDoList
+    // Utilizando un for
+
+    for (let i = 0; i < tareas.length; i++) {
+        // miToDoList.agregarTarea(tareas[i]);
+    }
+
 
     // Fecha de hoy
     let hoy = new Date();
@@ -75,6 +99,10 @@ async function main(): Promise<void> {
     miToDoList.agregarTarea(tarea2);
     miToDoList.agregarTarea(tarea3);
     miToDoList.agregarTarea(tarea4);
+
+    console.log(miToDoList.getTareas()[0]);
+
+    await input('Presione "Enter" para continuar...');
 
     let opcionMenu: number;
 
@@ -474,25 +502,13 @@ async function main(): Promise<void> {
                             await input('Presione "Enter" para continuar...');
                             continue;
                         } else {
-                            do {
-                                console.clear();
-                                console.log("Ingrese el año de vencimiento de la nueva tarea. Año (YYYY)\n");
-                                anioNuevaTarea = await input('> ');
-                                if (!comprobarFormatoAnio(anioNuevaTarea)) {
-                                    console.log("\nFormato no válido. Intente nuevamente.\n");
-                                    await input('Presione "Enter" para continuar...');
-                                    continue;
-                                } else {
-                                    if (parseInt(anioNuevaTarea) >= hoy.getFullYear()) {
-                                        esValidoElDato = true;
-                                    }
-                                    else {
-                                        console.log("\nEl año debe ser el actual o un año futuro. Intente nuevamente.\n");
-                                        await input('Presione "Enter" para continuar...');
-                                    }
-                                }
-                            } while (!esValidoElDato);
-
+                            if (parseInt(anioNuevaTarea) >= hoy.getFullYear()) {
+                                esValidoElDato = true;
+                            }
+                            else {
+                                console.log("\nEl año debe ser el actual o un año futuro. Intente nuevamente.\n");
+                                await input('Presione "Enter" para continuar...');
+                            }
                         }
                     } while (!esValidoElDato);
 
@@ -549,7 +565,9 @@ async function main(): Promise<void> {
                     descripcionNuevaTarea,
                     PRIORIDAD[prioridadNuevaTarea - 1],
                     ESTADO[estadoNuevaTarea - 1],
-                    new Date(fechaToString(anioNuevaTarea, mesNuevaTarea, diaNuevaTarea) + "T03:00:00Z") // UTC-3
+                    null,
+                    new Date(fechaToString(anioNuevaTarea, mesNuevaTarea, diaNuevaTarea) + "T03:00:00Z"), // UTC-3
+                    null
                 );
 
                 miToDoList.agregarTarea(nuevaTarea);
