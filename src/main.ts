@@ -32,73 +32,42 @@ function tareasAVer(): void {
 // Punto de entrada imperativo
 async function main(): Promise<void> {
 
-    let tarea1 = new Tarea(
-        "Comprar alimentos",
-        "Comprar frutas y verduras para la semana",
-        PRIORIDAD[1],
-        ESTADO[0],
-        null,
-        new Date(fechaToString("2025", "11", "15") + "T03:00:00Z"), // UTC-3
-        null
-    );
-
-    let tarea2 = new Tarea(
-        "Preparar presentación",
-        "Crear diapositivas para la reunión del lunes",
-        PRIORIDAD[0],
-        ESTADO[1],
-        null,
-        new Date(fechaToString("2024", "10", "30") + "T03:00:00Z"), // UTC-3
-        null
-    );
-
-    let tarea3 = new Tarea(
-        "Hacer ejercicio",
-        "Ir al gimnasio por la tarde",
-        PRIORIDAD[2],
-        ESTADO[2],
-        null,
-        new Date(fechaToString("2024", "06", "20") + "T03:00:00Z"), // UTC-3
-        null
-    );
-
-    let tarea4 = new Tarea(
-        "Leer un libro",
-        "Terminar de leer 'El Principito'",
-        PRIORIDAD[2],
-        ESTADO[3],
-        null,
-        new Date(fechaToString("2026", "01", "05") + "T03:00:00Z"), // UTC-3
-        null
-    );
-
-
-
     let miToDoList = new ToDoList();
     let salirDelMenu: boolean = false;
 
     // Leemos el archivo json.
-
-
-    console.log(new Date(tareas[0]["fechaCreacion"]));
-
-    await input('Presione "Enter" para continuar...');
-
     // Agregar tareas a MiToDoList
     // Utilizando un for
 
-    for (let i = 0; i < tareas.length; i++) {
-        // miToDoList.agregarTarea(tareas[i]);
+    try {
+        for (let i = 0; i < tareas.length; i++) {
+            miToDoList.agregarTarea(new Tarea(
+                tareas[i].titulo,
+                tareas[i].descripcion,
+                tareas[i].prioridad,
+                tareas[i].estado,
+                new Date(tareas[i].fechaCreacion),
+                new Date(tareas[i].fechaVencimiento),
+                new Date(tareas[i].fechaUltimaEdicion)
+            ));
+        }
+
+    } catch (error : any) {
+        // Manejo del error si ocurre en el bloque try
+        console.log("Error al leer archivo 'tasks.json': " + error.message);
+        await input('Presione "Enter" para finalizar el programa...');
+        return;
     }
+
+
+
+    console.log(miToDoList.getTareas()[0]);
+    await input('Presione "Enter" para continuar...');
 
 
     // Fecha de hoy
     let hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-    miToDoList.agregarTarea(tarea1);
-    miToDoList.agregarTarea(tarea2);
-    miToDoList.agregarTarea(tarea3);
-    miToDoList.agregarTarea(tarea4);
 
     console.log(miToDoList.getTareas()[0]);
 

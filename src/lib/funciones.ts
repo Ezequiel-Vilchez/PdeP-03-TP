@@ -33,9 +33,9 @@ function esFechaValida(anio: number, mes: number, dia: number): boolean {
     }
 }
 
-function guardarJson(archivo: Object): void {
+function guardarJson(archivo: Object, name: String): void {
     const jsonString = JSON.stringify(archivo, null, 4); // `null, 4` formatea el JSON con indentación
-    const filePath = 'tasks.json'; //nombre del archivo
+    const filePath = "'" + name + "'"; //nombre del archivo
 
     fs.writeFileSync(filePath, jsonString, 'utf8'); // se guarda el archivo
     console.log(`Datos guardados en ${filePath}`);
