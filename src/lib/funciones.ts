@@ -41,4 +41,4 @@ function guardarJson(archivo: Object): void {
     console.log(`Datos guardados en ${filePath}`);
 }
 
-export { esFechaValida, comprobarFormatoAnio, comprobarFormatoMes, comprobarFormatoDia, fechaToString };
+export { esFechaValida, comprobarFormatoAnio, comprobarFormatoMes, comprobarFormatoDia, fechaToString, guardarJson };
