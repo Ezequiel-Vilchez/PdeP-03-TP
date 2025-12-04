@@ -1,42 +1,47 @@
 [
     {
-        "id": 0,
         "titulo": "Comprar alimentos",
         "descripcion": "Comprar frutas y verduras para la semana",
         "prioridad": "Media",
         "estado": "pendiente",
-        "fechaCreacion": "2025-10-28T23:58:58.495Z",
-        "fechaVencimiento": "2026-01-05T03:00:00.000Z",
-        "fechaUltimaEdicion": "2025-10-28T23:58:58.495Z"
+        "creacion": "2025-10-28T23:58:58.495Z",
+        "ultimaEdicion": "2025-10-28T23:58:58.495Z",
+        "vencimiento": "2026-01-05T03:00:00.000Z"
     },
     {
-        "id": 1,
         "titulo": "Preparar presentación",
         "descripcion": "Crear diapositivas para la reunión del lunes",
         "prioridad": "Baja",
         "estado": "en progreso",
-        "fechaCreacion": "2025-10-30T03:00:00.000Z",
-        "fechaVencimiento": "2025-11-10T03:00:00.000Z",
-        "fechaUltimaEdicion": "2025-10-30T03:00:00.000Z"
+        "creacion": "2025-10-30T03:00:00.000Z",
+        "ultimaEdicion": "2025-10-30T03:00:00.000Z",
+        "vencimiento": "2025-11-10T03:00:00.000Z"
     },
     {
-        "id": 2,
         "titulo": "Hacer ejercicio",
         "descripcion": "Ir al gimnasio por la tarde",
         "prioridad": "Alta",
         "estado": "completada",
-        "fechaCreacion": "2025-06-20T03:00:00.000Z",
-        "fechaVencimiento": "2025-07-26T03:00:00.000Z",
-        "fechaUltimaEdicion": "2025-06-20T03:00:00.000Z"
+        "creacion": "2025-06-20T03:00:00.000Z",
+        "ultimaEdicion": "2025-06-20T03:00:00.000Z",
+        "vencimiento": "2025-07-26T03:00:00.000Z"
     },
     {
-        "id": 3,
         "titulo": "Leer un libro",
         "descripcion": "Terminar de leer 'El Principito'",
         "prioridad": "Alta",
         "estado": "cancelada",
-        "fechaCreacion": "2025-01-05T03:00:00.000Z",
-        "fechaVencimiento": "2026-10-11T03:00:00.000Z",
-        "fechaUltimaEdicion": "2025-01-05T03:00:00.000Z"
+        "creacion": "2025-01-05T03:00:00.000Z",
+        "ultimaEdicion": "2025-01-05T03:00:00.000Z",
+        "vencimiento": "2025-12-05T03:00:00.000Z"
+    },
+    {
+        "titulo": "Html",
+        "descripcion": "aprendiendo html",
+        "prioridad": "Media",
+        "estado": "pendiente",
+        "creacion": "2025-12-03T03:00:00.000Z",
+        "ultimaEdicion": "2025-12-03T03:00:00.000Z",
+        "vencimiento": "2025-12-10T03:00:00.000Z"
     }
 ]

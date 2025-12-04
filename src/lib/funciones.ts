@@ -1,5 +1,3 @@
-import fs from 'fs';
-
 const formatoValidoAnio = /^\d{4}$/; // Considera años de 0000 a 9999
 const formatoValidoMes = /^(0[1-9]|1[0-2])$/; // Considera meses del 01 al 12
 const formatoValidoDia = /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])$/; // Considera días del 01 al 31
@@ -33,12 +31,4 @@ function esFechaValida(anio: number, mes: number, dia: number): boolean {
     }
 }
 
-function guardarJson(archivo: Object, name: String): void {
-    const jsonString = JSON.stringify(archivo, null, 4); // `null, 4` formatea el JSON con indentación
-    const filePath = "'" + name + "'"; //nombre del archivo
-
-    fs.writeFileSync(filePath, jsonString, 'utf8'); // se guarda el archivo
-    console.log(`Datos guardados en ${filePath}`);
-}
-
-export { esFechaValida, comprobarFormatoAnio, comprobarFormatoMes, comprobarFormatoDia, fechaToString, guardarJson };
+export { esFechaValida, comprobarFormatoAnio, comprobarFormatoMes, comprobarFormatoDia, fechaToString };

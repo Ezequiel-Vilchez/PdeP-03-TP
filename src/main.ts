@@ -3,7 +3,9 @@ import { Tarea } from "./class/Tarea";
 import { ToDoList } from "./class/ToDoList";
 import { esFechaValida, comprobarFormatoAnio, comprobarFormatoMes, comprobarFormatoDia, fechaToString } from "./lib/funciones";
 import { input, close } from "./lib/input";
-import tareas from './tasks.json';
+import fs from 'fs/promises';
+import path from 'path';
+
 
 
 // Menús de opciones
@@ -29,49 +31,97 @@ function tareasAVer(): void {
     console.log('Ingrese una opción.\n');
 }
 
-// Punto de entrada imperativo
-async function main(): Promise<void> {
+interface TareaJSON {
+    titulo: string;
+    descripcion: string;
+    prioridad: string;
+    estado: string;
+    fechaCreacion: string;
+    fechaUltimaEdicion: string;
+    fechaVencimiento: string;
+}
 
-    let miToDoList = new ToDoList();
-    let salirDelMenu: boolean = false;
+// Ruta al archivo json
+const filePath = path.join(__dirname, '../src/tasks.json');
 
-    // Leemos el archivo json.
-    // Agregar tareas a MiToDoList
-    // Utilizando un for
-
+async function cargarTareasDesdeArchivo(): Promise<Tarea[]> {
     try {
-        for (let i = 0; i < tareas.length; i++) {
-            miToDoList.agregarTarea(new Tarea(
-                tareas[i].titulo,
-                tareas[i].descripcion,
-                tareas[i].prioridad,
-                tareas[i].estado,
-                new Date(tareas[i].fechaCreacion),
-                new Date(tareas[i].fechaVencimiento),
-                new Date(tareas[i].fechaUltimaEdicion)
-            ));
+        try {
+            await fs.access(filePath);
+        } catch {
+            console.log("El archivo tasks.json no existe. Se iniciará una lista vacía.");
+            return [];
         }
 
-    } catch (error : any) {
-        // Manejo del error si ocurre en el bloque try
-        console.log("Error al leer archivo 'tasks.json': " + error.message);
-        await input('Presione "Enter" para finalizar el programa...');
-        return;
+        const dataRaw = await fs.readFile(filePath, 'utf-8');
+        const tareasJSON: TareaJSON[] = JSON.parse(dataRaw);
+        
+        const tareasConvertidas: Tarea[] = [];
+
+        tareasJSON.forEach((item, index) => {
+            const nuevaTarea = new Tarea(
+                item.titulo,
+                item.descripcion,
+                item.prioridad,
+                item.estado,
+                new Date(item.fechaCreacion),
+                new Date(item.fechaVencimiento), 
+                new Date(item.fechaUltimaEdicion)
+            );
+            
+            tareasConvertidas.push(nuevaTarea);
+        });
+
+        console.log(`\n Se han cargado ${tareasConvertidas.length} tareas exitosamente desde el archivo.\n`);
+        return tareasConvertidas;
+
+    } catch (error) {
+        console.error("Error al leer el archivo de tareas:", error);
+        return [];
     }
+}
+async function guardarTareasEnArchivo(listaTareas: Tarea[]): Promise<void> {
+    try {
+        const datosAGuardar = listaTareas.map(unaTarea => {
+            return {
+                titulo: unaTarea.getTitulo(),
+                descripcion: unaTarea.getDescripcion(),
+                prioridad: unaTarea.getPrioridad(),
+                estado: unaTarea.getEstado(),
+                creacion: unaTarea.getFechaCreacion().toISOString(),
+                ultimaEdicion: unaTarea.getFechaUltimaEdicion()?.toISOString(),
+                vencimiento: unaTarea.getFechaVencimiento()?.toISOString()
+            };
+        });
 
+        await fs.writeFile(filePath, JSON.stringify(datosAGuardar, null, 4));
+    } catch (error) {
+        console.error("Error al guardar archivo:", error);
+    }
+}
 
+// Punto de entrada imperativo
+async function main(): Promise<void> {
+    console.clear();
 
-    console.log(miToDoList.getTareas()[0]);
+    const miToDoList = new ToDoList();
+    
+    console.log("Cargando tareas...");
+    const tareasDelArchivo = await cargarTareasDesdeArchivo();
+    
+    for(const tarea of tareasDelArchivo) {
+        miToDoList.agregarTarea(tarea);
+    }
+    
     await input('Presione "Enter" para continuar...');
 
+    let salirDelMenu: boolean = false;
+    
+    console.clear();
 
     // Fecha de hoy
     let hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-
-    console.log(miToDoList.getTareas()[0]);
-
-    await input('Presione "Enter" para continuar...');
 
     let opcionMenu: number;
 
@@ -100,9 +150,6 @@ async function main(): Promise<void> {
                 let nuevaDescripcion: string;
                 let nuevaPrioridad: number;
                 let nuevoEstado: number;
-                // let nuevoAnio: string;
-                // let nuevoMes: string;
-                // let nuevoDia: string;
 
                 if (miToDoList.getTareas().length === 0) {
                     console.log("No hay tareas cargadas.\n");
@@ -198,14 +245,13 @@ async function main(): Promise<void> {
                                         console.log("Ingrese el número del campo que desea editar.\n");
                                         opcionCampoAEditar = parseInt(await input('> '), 10);
 
-                                        let day = new Date();
-
                                         switch (opcionCampoAEditar) {
                                             case 1:
                                                 // Editar título
                                                 nuevoTitulo = await input('Ingrese el nuevo título: ');
                                                 miToDoList.getUnaTarea(idTareaAVer).setTitulo(nuevoTitulo);
-                                                miToDoList.getUnaTarea(idTareaAVer).setFechaUltimaEdicion(new Date(fechaToString(day.getFullYear().toString(), (day.getMonth() + 1).toString(), day.getDate().toString()) + "T03:00:00Z"));
+                                                miToDoList.getUnaTarea(idTareaAVer).setFechaUltimaEdicion(new Date(fechaToString(hoy.getFullYear().toString(), (hoy.getMonth() + 1).toString(), hoy.getDate().toString()) + "T03:00:00Z"));
+                                                await guardarTareasEnArchivo(miToDoList.getTareas());
                                                 console.log("\nTítulo editado con éxito.\n");
                                                 await input('Presione "Enter" para continuar...');
                                                 break;
@@ -213,7 +259,8 @@ async function main(): Promise<void> {
                                                 // Editar descripción
                                                 nuevaDescripcion = await input('Ingrese la nueva descripción: ');
                                                 miToDoList.getUnaTarea(idTareaAVer).setDescripcion(nuevaDescripcion);
-                                                miToDoList.getUnaTarea(idTareaAVer).setFechaUltimaEdicion(new Date(fechaToString(day.getFullYear().toString(), (day.getMonth() + 1).toString(), day.getDate().toString()) + "T03:00:00Z"));
+                                                miToDoList.getUnaTarea(idTareaAVer).setFechaUltimaEdicion(new Date(fechaToString(hoy.getFullYear().toString(), (hoy.getMonth() + 1).toString(), hoy.getDate().toString()) + "T03:00:00Z"));
+                                                await guardarTareasEnArchivo(miToDoList.getTareas());
                                                 console.log("\nDescripción editada con éxito.\n");
                                                 await input('Presione "Enter" para continuar...');
                                                 break;
@@ -229,7 +276,8 @@ async function main(): Promise<void> {
 
                                                     if (nuevaPrioridad >= 1 && nuevaPrioridad <= 3) {
                                                         miToDoList.getUnaTarea(idTareaAVer).setPrioridad(PRIORIDAD[nuevaPrioridad - 1]);
-                                                        miToDoList.getUnaTarea(idTareaAVer).setFechaUltimaEdicion(new Date(fechaToString(day.getFullYear().toString(), (day.getMonth() + 1).toString(), day.getDate().toString()) + "T03:00:00Z"));
+                                                        miToDoList.getUnaTarea(idTareaAVer).setFechaUltimaEdicion(new Date(fechaToString(hoy.getFullYear().toString(), (hoy.getMonth() + 1).toString(), hoy.getDate().toString()) + "T03:00:00Z"));
+                                                        await guardarTareasEnArchivo(miToDoList.getTareas());
                                                         console.log("\nPrioridad editada con éxito.\n");
                                                         await input('Presione "Enter" para continuar...');
                                                     } else {
@@ -250,7 +298,8 @@ async function main(): Promise<void> {
                                                     nuevoEstado = parseInt(await input('> '), 10);
                                                     if (nuevoEstado >= 1 && nuevoEstado <= 4) {
                                                         miToDoList.getUnaTarea(idTareaAVer).setEstado(ESTADO[nuevoEstado - 1]);
-                                                        miToDoList.getUnaTarea(idTareaAVer).setFechaUltimaEdicion(new Date(fechaToString(day.getDay().toString(), (day.getMonth() + 1).toString(), day.getFullYear().toString()) + "T03:00:00Z"));
+                                                        miToDoList.getUnaTarea(idTareaAVer).setFechaUltimaEdicion(new Date(fechaToString(hoy.getDay().toString(), (hoy.getMonth() + 1).toString(), hoy.getFullYear().toString()) + "T03:00:00Z"));
+                                                        await guardarTareasEnArchivo(miToDoList.getTareas());
                                                         console.log("\nEstado editado con éxito.\n");
                                                         await input('Presione "Enter" para continuar...');
                                                     } else {
@@ -331,6 +380,7 @@ async function main(): Promise<void> {
                                                             continue;
                                                         } else {
                                                             miToDoList.getUnaTarea(idTareaAVer).setFechaVencimiento(new Date(fechaToString(nuevoAnio, nuevoMes, nuevoDia) + "T03:00:00Z")); // UTC-3
+                                                            await guardarTareasEnArchivo(miToDoList.getTareas());
                                                             console.log("\nFecha de vencimiento editada con éxito.\n");
                                                             await input('Presione "Enter" para continuar...');
                                                         }
@@ -534,12 +584,13 @@ async function main(): Promise<void> {
                     descripcionNuevaTarea,
                     PRIORIDAD[prioridadNuevaTarea - 1],
                     ESTADO[estadoNuevaTarea - 1],
-                    null,
+                    hoy,
                     new Date(fechaToString(anioNuevaTarea, mesNuevaTarea, diaNuevaTarea) + "T03:00:00Z"), // UTC-3
-                    null
+                    hoy
                 );
 
                 miToDoList.agregarTarea(nuevaTarea);
+                await guardarTareasEnArchivo(miToDoList.getTareas());
                 console.log("\nTarea agregada con éxito.\n");
                 await input('Presione "Enter" para continuar...');
 
