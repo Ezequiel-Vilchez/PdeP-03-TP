@@ -59,14 +59,33 @@ async function cargarTareasDesdeArchivo(): Promise<Tarea[]> {
         const tareasConvertidas: Tarea[] = [];
 
         tareasJSON.forEach((item, index) => {
+            // Parseo seguro de fechas: si la propiedad no existe o es inválida, usamos null o una fecha por defecto
+            let fechaCreacion: Date | null = null;
+            if (item.fechaCreacion) {
+                const d = new Date(item.fechaCreacion);
+                fechaCreacion = isNaN(d.getTime()) ? null : d;
+            }
+
+            let fechaUltimaEdicion: Date | null = null;
+            if (item.fechaUltimaEdicion) {
+                const d = new Date(item.fechaUltimaEdicion);
+                fechaUltimaEdicion = isNaN(d.getTime()) ? null : d;
+            }
+
+            let fechaVencimiento: Date = new Date();
+            if (item.fechaVencimiento) {
+                const d = new Date(item.fechaVencimiento);
+                fechaVencimiento = isNaN(d.getTime()) ? new Date() : d;
+            }
+
             const nuevaTarea = new Tarea(
                 item.titulo,
                 item.descripcion,
                 item.prioridad,
                 item.estado,
-                new Date(item.fechaCreacion),
-                new Date(item.fechaVencimiento), 
-                new Date(item.fechaUltimaEdicion)
+                fechaCreacion,
+                fechaVencimiento,
+                fechaUltimaEdicion
             );
             
             tareasConvertidas.push(nuevaTarea);
@@ -88,9 +107,9 @@ async function guardarTareasEnArchivo(listaTareas: Tarea[]): Promise<void> {
                 descripcion: unaTarea.getDescripcion(),
                 prioridad: unaTarea.getPrioridad(),
                 estado: unaTarea.getEstado(),
-                creacion: unaTarea.getFechaCreacion().toISOString(),
-                ultimaEdicion: unaTarea.getFechaUltimaEdicion()?.toISOString(),
-                vencimiento: unaTarea.getFechaVencimiento()?.toISOString()
+                fechaCreacion: unaTarea.getFechaCreacion() ? unaTarea.getFechaCreacion().toISOString() : null,
+                fechaUltimaEdicion: unaTarea.getFechaUltimaEdicion() ? unaTarea.getFechaUltimaEdicion().toISOString() : null,
+                fechaVencimiento: unaTarea.getFechaVencimiento() ? unaTarea.getFechaVencimiento().toISOString() : null
             };
         });
 
@@ -298,7 +317,7 @@ async function main(): Promise<void> {
                                                     nuevoEstado = parseInt(await input('> '), 10);
                                                     if (nuevoEstado >= 1 && nuevoEstado <= 4) {
                                                         miToDoList.getUnaTarea(idTareaAVer).setEstado(ESTADO[nuevoEstado - 1]);
-                                                        miToDoList.getUnaTarea(idTareaAVer).setFechaUltimaEdicion(new Date(fechaToString(hoy.getDay().toString(), (hoy.getMonth() + 1).toString(), hoy.getFullYear().toString()) + "T03:00:00Z"));
+                                                        miToDoList.getUnaTarea(idTareaAVer).setFechaUltimaEdicion(new Date(fechaToString(hoy.getFullYear().toString(), (hoy.getMonth() + 1).toString(), hoy.getDate().toString()) + "T03:00:00Z"));
                                                         await guardarTareasEnArchivo(miToDoList.getTareas());
                                                         console.log("\nEstado editado con éxito.\n");
                                                         await input('Presione "Enter" para continuar...');
